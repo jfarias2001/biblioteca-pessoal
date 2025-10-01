@@ -50,3 +50,55 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/biblioteca-pessoal:latest
+
+  deploy-dev:
+    name: Deploy to Development
+    needs: docker
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    environment: development
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry (GHCR)
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Simulate deploy to development
+        run: |
+          echo "Deploying to development..."
+          echo "Image: ghcr.io/${{ github.repository_owner }}/biblioteca-pessoal:latest"
+          # (simulação) Exemplo: docker pull ghcr.io/${{ github.repository_owner }}/biblioteca-pessoal:latest
+
+  deploy-prod:
+    name: Deploy to Production
+    needs: deploy-dev
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    environment:
+      name: production
+      url: https://example.com   # opcional, aparece na UI do ambiente
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Simulate production deploy
+        run: |
+          echo "Deploying to PRODUCTION..."
+          echo "Image: ghcr.io/${{ github.repository_owner }}/biblioteca-pessoal:latest"
+          # Aqui você colocaria os comandos reais de deploy (ssh -> docker pull -> docker run, kubectl, etc.)
